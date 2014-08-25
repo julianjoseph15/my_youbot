@@ -1,0 +1,280 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" 
+ 	xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+    	xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+    	xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+	name="robot1_xacro">
+
+
+	<include filename="$(find erratic_description)/urdf/erratic_hokuyo_laser.xacro" />
+	<include filename="$(find my_robot_4)/urdf/common.xacro" />
+
+	
+ 	<!-- simplified box collision geometry for base -->
+  	<property name="base_size_x" value="0.570" />
+  	<property name="base_size_y" value="0.360" />
+  	<property name="base_size_z" value="0.100" />
+	<property name="base_mass" value="22.0" />
+
+	<property name="caster_offset_x" value="0.228"  />  
+  	<property name="caster_offset_y" value="0.158"  />  
+  	<property name="caster_offset_z" value="-0.034" />
+	<property name="caster_mass" value="0.1" />
+
+	<property name="wheel_offset_x" value="0.0"  />  
+  	<property name="wheel_offset_y" value="0.0"  />  
+  	<property name="wheel_offset_z" value="0.0" />
+	<property name="wheel_mass" value="0.4" />
+
+	<property name="wheel_radius" value="0.05" />
+	<property name="wheel_length" value="0.005" />
+  	
+	<property name="caster_joint_damping" value="1.0" />
+	<property name="caster_joint_friction" value="1.0" />
+	<property name="caster_joint_effort" value="30" />
+	<property name="caster_joint_velocity" value="10" />
+	<property name="caster_joint_safety_k_velocity" value="10.0" />
+
+	<property name="wheel_joint_damping" value="1.0" />
+	<property name="wheel_joint_friction" value="1.0" />
+	<property name="wheel_joint_effort" value="30" />
+	<property name="wheel_joint_velocity" value="10" />
+	<property name="wheel_joint_safety_k_velocity" value="10.0" />
+
+        <!-- BASE LASER ATTACHMENT -->
+        <erratic_hokuyo_laser parent="base_link">
+                <origin xyz="0.18 0 0.11" rpy="0 0 0" />
+        </erratic_hokuyo_laser>
+
+	<xacro:property name="length_wheel" value="0.05" />
+	<xacro:property name="radius_wheel" value="0.05" />
+	<xacro:macro name="default_inertial" params="mass">
+               <inertial>
+                       <mass value="${mass}" />
+                       <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                                iyy="1.0" iyz="0.0"
+                                izz="1.0" />
+               </inertial>
+	</xacro:macro>
+
+	<link name="base_footprint">
+	<inertial>
+        	<mass value="0.1" />
+        		<origin xyz="0 0 ${-base_size_z / 2.0}" rpy="0 0 0" />
+        		<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                 			iyy="1.0" iyz="0.0" izz="1.0" />
+      				</inertial>
+      			<visual>
+        			<origin xyz="0 0 0" rpy="0 0 0" />
+        			<geometry>
+          				<box size="0.001 0.001 0.001" />
+        			</geometry>
+               			
+      			</visual>
+      			<collision>
+        			<origin xyz="0 0 ${-base_size_z / 2.0}" rpy="0 0 0" />
+        			<geometry>
+          				<box size="0.001 0.001 0.001" />
+        			</geometry>
+      			</collision>
+ 	</link>
+
+	<gazebo reference="base_footprint">
+		<material>Gazebo/Green</material>
+		<turnGravityOff>false</turnGravityOff>
+	</gazebo>
+
+	<joint name="base_footprint_joint" type="fixed">
+		<origin xyz="0 0 0" />
+		<parent link="base_footprint" />
+		<child link="base_link" />
+	</joint>
+
+
+	<link name="base_link">
+   		<inertial>
+        			<mass value="${base_mass}" />
+        			<origin xyz="0 0 0" />
+        			<inertia ixx="5.652232699207" ixy="-0.009719934438" ixz="1.293988226423"
+                 			iyy="5.669473158652" iyz="-0.007379583694" izz="3.683196351726" />
+      				</inertial>
+      			<visual>
+        			<origin xyz="0 0 0" rpy="0 0 0" />  
+        			<geometry>
+          				<mesh filename="package://youbot-ros-pkg-kdl/meshes/youbot_base/base.dae"/>
+        			</geometry> 
+        			
+      			</visual>
+      			<collision>
+        			<origin xyz="0 0 0" rpy="0 0 0" />
+        			<geometry>
+          				
+					<mesh filename="package://youbot-ros-pkg-kdl/meshes/youbot_base/base_convex.stl"/>
+	       			</geometry>
+      			</collision>
+ 	</link>
+
+ 	<link name="wheel_1">
+   		<inertial>
+        		<mass value="${wheel_mass}" />
+        		<origin xyz="0 0 0" />
+       			<inertia  ixx="0.012411765597" ixy="-0.000711733678" ixz="0.00050272983"
+                  		iyy="0.015218160428" iyz="-0.000004273467" izz="0.011763977943" />
+      			</inertial>
+      			<visual>
+        			<origin xyz="0 0 0" rpy="0 0 0" />
+					
+				<geometry>
+					<sphere radius="${wheel_radius}"/>
+				</geometry>
+       				
+      			</visual>
+      			<collision>
+        			<origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+        			<geometry>
+        		       		<cylinder radius="${wheel_radius}" length="${wheel_length}" />
+        	       		</geometry>
+      			</collision>
+ 	</link>
+
+ 	<link name="wheel_2">
+   		<inertial>
+        		<mass value="${wheel_mass}" />
+        		<origin xyz="0 0 0" />
+       			<inertia  ixx="0.012411765597" ixy="-0.000711733678" ixz="0.00050272983"
+                  		iyy="0.015218160428" iyz="-0.000004273467" izz="0.011763977943" />
+      			</inertial>
+      			<visual>
+        			<origin xyz="0 0 0" rpy="0 0 0" />
+				<geometry>
+          				
+					<sphere radius="${wheel_radius}"/>
+        			</geometry>
+       					
+      			</visual>
+      			<collision>
+        			<origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+        			<geometry>
+        		       		<cylinder radius="${wheel_radius}" length="${wheel_length}" />
+        	       		</geometry>
+      			</collision>
+
+ 	</link>
+    
+ 	<link name="wheel_3">
+   		<inertial>
+        		<mass value="${wheel_mass}" />
+        		<origin xyz="0 0 0" />
+       			<inertia  ixx="0.012411765597" ixy="-0.000711733678" ixz="0.00050272983"
+                  		iyy="0.015218160428" iyz="-0.000004273467" izz="0.011763977943" />
+      			</inertial>
+      			<visual>
+        			<origin xyz="0 0 0" rpy="0 0 0" />
+				<geometry>
+          				
+					<sphere radius="${wheel_radius}"/>
+        			</geometry>
+       				
+      			</visual>
+      			<collision>
+        			<origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+        			<geometry>
+        		       		<cylinder radius="${wheel_radius}" length="${wheel_length}" />
+        	       		</geometry>
+      			</collision>
+ 	</link>
+
+ 	<link name="wheel_4">
+   		<inertial>
+        		<mass value="${wheel_mass}" />
+        		<origin xyz="0 0 0" />
+       			<inertia  ixx="0.012411765597" ixy="-0.000711733678" ixz="0.00050272983"
+                  		iyy="0.015218160428" iyz="-0.000004273467" izz="0.011763977943" />
+      			</inertial>
+      			<visual>
+        			<origin xyz="0 0 0" rpy="0 0 0" />
+				<geometry>
+          				
+					<sphere radius="${wheel_radius}"/>
+        			</geometry>
+       				
+      			</visual>
+      			<collision>
+        			<origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+        			<geometry>
+        		       		<cylinder radius="${wheel_radius}" length="${wheel_length}" />
+        	       		</geometry>
+      			</collision>
+
+ 	</link>
+
+
+
+ <joint name="base_to_wheel1" type="continuous">
+   <parent link="base_link"/>
+   <child link="wheel_1"/>
+   <origin xyz="${caster_offset_x} ${caster_offset_y} ${caster_offset_z}" rpy="0 0 0" />
+   <axis xyz="0 0 1" />
+ </joint>
+
+ <joint name="base_to_wheel2" type="continuous">
+   <axis xyz="0 0 1" />
+   <anchor xyz="0 0 0" />
+   <limit effort="100" velocity="100" />
+   <parent link="base_link"/>
+   <child link="wheel_2"/>
+   <origin xyz="${caster_offset_x} ${-caster_offset_y} ${caster_offset_z}" rpy="0 0 0" />
+</joint>
+
+ <joint name="base_to_wheel3" type="continuous">
+   <parent link="base_link"/>
+   <axis xyz="0 0 1" />
+   <child link="wheel_3"/>
+   <origin xyz="${-caster_offset_x} ${caster_offset_y} ${caster_offset_z}" rpy="0 0 0" />
+ </joint>
+
+ <joint name="base_to_wheel4" type="continuous">
+   <parent link="base_link"/>
+   <axis xyz="0 0 1" />
+   <child link="wheel_4"/>
+   <origin xyz="${-caster_offset_x} ${-caster_offset_y} ${caster_offset_z}" rpy="0 0 0" />
+ </joint>
+
+ <gazebo reference="base_link">
+        <material>Erratic/BlueBrushedAluminum</material>
+ </gazebo>
+ 
+ <gazebo reference="wheel_1">
+        <material>Erratic/Black</material>
+ </gazebo>
+
+ <gazebo reference="wheel_2">
+        <material>Erratic/Black</material>
+ </gazebo>
+
+ <gazebo reference="wheel_3">
+        <material>Erratic/Black</material>
+ </gazebo>
+
+ <gazebo reference="wheel_4">
+        <material>Erratic/Black</material>
+ </gazebo>
+
+ <gazebo>
+
+ <controller:diffdrive_plugin name="differential_drive_controller" plugin="libdiffdrive_plugin.so">
+        <alwaysOn>true</alwaysOn>
+        <update>100</update>
+        <updateRate>100.0</updateRate>
+        <leftJoint>base_to_wheel4</leftJoint>
+        <rightJoint>base_to_wheel1</rightJoint>
+        <wheelSeparation>0.33</wheelSeparation>
+        <wheelDiameter>0.1</wheelDiameter>
+        <torque>5</torque>
+        <interface:position name="position_iface_0"/>
+ 	<topicName>cmd_vel</topicName>
+ </controller:diffdrive_plugin>
+
+</gazebo>
+</robot>
